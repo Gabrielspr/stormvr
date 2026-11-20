@@ -1,0 +1,162 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+		A10000000000000000000101 = {isa = PBXBuildFile; fileRef = A10000000000000000000201; };
+		A10000000000000000000102 = {isa = PBXBuildFile; fileRef = A10000000000000000000202; };
+		A10000000000000000000103 = {isa = PBXBuildFile; fileRef = A10000000000000000000203; };
+		A10000000000000000000104 = {isa = PBXBuildFile; fileRef = A10000000000000000000204; };
+		A10000000000000000000105 = {isa = PBXBuildFile; fileRef = A10000000000000000000205; };
+		A10000000000000000000106 = {isa = PBXBuildFile; fileRef = A10000000000000000000206; };
+
+		A10000000000000000000201 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StormVRApp.swift; sourceTree = "<group>"; };
+		A10000000000000000000202 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wire.swift; sourceTree = "<group>"; };
+		A10000000000000000000203 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracking.swift; sourceTree = "<group>"; };
+		A10000000000000000000204 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoFeed.swift; sourceTree = "<group>"; };
+		A10000000000000000000205 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTracker.swift; sourceTree = "<group>"; };
+		A10000000000000000000206 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000000000000000000207 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000208 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StormVR.app; sourceTree = BUILT_PRODUCTS_DIR; };
+
+		A10000000000000000000301 = {
+			isa = PBXGroup;
+			children = (A10000000000000000000302, A10000000000000000000303);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000302 = {
+			isa = PBXGroup;
+			children = (A10000000000000000000201, A10000000000000000000202, A10000000000000000000203, A10000000000000000000204, A10000000000000000000205, A10000000000000000000206, A10000000000000000000207);
+			path = StormVR;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000303 = {
+			isa = PBXGroup;
+			children = (A10000000000000000000208);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000401 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (A10000000000000000000101, A10000000000000000000102, A10000000000000000000103, A10000000000000000000104, A10000000000000000000105);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000402 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000403 = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (A10000000000000000000106);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000501 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000702;
+			buildPhases = (A10000000000000000000401, A10000000000000000000402, A10000000000000000000403);
+			buildRules = ();
+			dependencies = ();
+			name = StormVR;
+			productName = StormVR;
+			productReference = A10000000000000000000208;
+			productType = "com.apple.product-type.application";
+		};
+		A10000000000000000000502 = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A10000000000000000000501 = {CreatedOnToolsVersion = 16.0; ProvisioningStyle = Automatic; };
+				};
+			};
+			buildConfigurationList = A10000000000000000000701;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "pt-BR";
+			hasScannedForEncodings = 0;
+			knownRegions = ("pt-BR", Base);
+			mainGroup = A10000000000000000000301;
+			productRefGroup = A10000000000000000000303;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (A10000000000000000000501);
+		};
+		A10000000000000000000601 = {
+			isa = XCBuildConfiguration;
+			name = Debug;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+		};
+		A10000000000000000000602 = {
+			isa = XCBuildConfiguration;
+			name = Release;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+			};
+		};
+		A10000000000000000000603 = {
+			isa = XCBuildConfiguration;
+			name = Debug;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = StormVR/Info.plist;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stormvr.ios;
+				PRODUCT_NAME = StormVR;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+		};
+		A10000000000000000000604 = {
+			isa = XCBuildConfiguration;
+			name = Release;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = StormVR/Info.plist;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stormvr.ios;
+				PRODUCT_NAME = StormVR;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+		};
+		A10000000000000000000701 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (A10000000000000000000601, A10000000000000000000602);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000702 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (A10000000000000000000603, A10000000000000000000604);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+	};
+	rootObject = A10000000000000000000502;
+}

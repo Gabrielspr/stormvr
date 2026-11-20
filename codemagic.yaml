@@ -1,0 +1,40 @@
+workflows:
+  stormvr-ios-unsigned:
+    name: StormVR iPhone | IPA sem assinatura
+    instance_type: mac_mini_m2
+    max_build_duration: 25
+    environment:
+      xcode: latest
+    scripts:
+      - name: Verificar protocolo e compilar para iPhone
+        script: |
+          bash "$CM_BUILD_DIR/Source/ios/scripts/package-unsigned.sh" "$CM_BUILD_DIR/build/ios/ipa/StormVR-unsigned.ipa"
+    artifacts:
+      - build/ios/ipa/StormVR-unsigned.ipa
+
+  stormvr-ios-adhoc:
+    name: StormVR iPhone | IPA assinado Ad Hoc
+    instance_type: mac_mini_m2
+    max_build_duration: 25
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: ad_hoc
+        bundle_identifier: com.stormvr.ios
+    scripts:
+      - name: Verificar protocolo UDP
+        script: |
+          cd "$CM_BUILD_DIR"
+          mkdir -p build
+          xcrun swiftc Source/ios/StormVR/Wire.swift Source/ios/tests/WireCheck.swift -o build/stormvr-wire-check
+          build/stormvr-wire-check
+      - name: Aplicar perfil de provisionamento
+        script: |
+          xcode-project use-profiles --project "$CM_BUILD_DIR/Source/ios/StormVR.xcodeproj"
+      - name: Exportar IPA assinado
+        script: |
+          cd "$CM_BUILD_DIR"
+          xcode-project build-ipa --project Source/ios/StormVR.xcodeproj --scheme StormVR
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
