@@ -24,7 +24,7 @@ xcodebuild -project "$root/StormVR.xcodeproj" -scheme StormVR -configuration Rel
   -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$stage/build" \
   CODE_SIGNING_ALLOWED=NO build
 app="$stage/build/Build/Products/Release-iphoneos/StormVR.app"
-xcrun lipo -verify_arch arm64 "$app/StormVR"
+xcrun lipo "$app/StormVR" -verify_arch arm64
 mkdir -p "$stage/Payload"
 ditto "$app" "$stage/Payload/StormVR.app"
 ditto -c -k --norsrc --keepParent "$stage/Payload" "$stage/StormVR-unsigned.ipa"
