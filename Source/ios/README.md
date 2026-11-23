@@ -19,7 +19,15 @@ O Vision identifica até duas mãos. A profundidade é estimada pelo tamanho da 
 
 No Android, o prazo de perda passou a ser independente para cada mão, e o fechamento da pinça precisa aparecer em dois quadros consecutivos.
 
-## Exibir a imagem do PC
+## Exibir a imagem do PC com Apollo
+
+1. No iPhone, informe o IPv4 do PC, ative **Exibir vídeo do PC** e escolha **Apollo / Sunshine**.
+2. Toque em **Conectar ao Apollo**. Se aparecer um PIN, digite-o na aba **PIN** do painel Apollo no PC, normalmente em `https://localhost:47990`. Use **StormVR iPhone** como nome do cliente.
+3. Selecione **Desktop** ou o aplicativo configurado no Apollo para capturar o monitor do SteamVR. Toque em **Iniciar sessão**. O StormVR solicita vídeo H.264 a 1080p/60, com áudio estéreo. A porta do rastreamento no driver continua sendo 5556 por padrão.
+
+O visor coloca uma imagem em cada olho. Para um desktop comum, deixe **PC já envia os dois olhos (SBS)** desligado e o app mostrará a mesma imagem nos dois olhos. Para ter profundidade estereoscópica, capture uma saída do PC que já contenha os olhos esquerdo e direito lado a lado e ligue a opção. O app recorta a metade correspondente a cada olho.
+
+## Exibir a imagem com a captura StormVR
 
 No Windows, com Python 3 e FFmpeg disponíveis, execute na raiz do repositório:
 
@@ -29,7 +37,7 @@ python Source/pc_driver/tools/stream_ios.py --bind 192.168.1.20 --size 1920x1080
 
 Substitua o IPv4, a resolução e as coordenadas pelo seu monitor SteamVR. O exemplo usa um monitor à direita de outro que tem 1920 pixels de largura. Se o FFmpeg não estiver no PATH, informe o caminho com `--ffmpeg`. Permita TCP 8089 para esse PC na rede privada. A transmissão local é MJPEG por HTTP e usa um código temporário exibido no terminal. Use em uma rede confiável.
 
-No iPhone, ative **Exibir vídeo do PC** e informe o código exibido. Mantenha **Imagem lado a lado (SBS)** marcada para a saída estereoscópica do SteamVR. No modo mono, a mesma imagem é repetida nos dois olhos. O transmissor entrega sempre o quadro mais recente e não carrega áudio. A qualidade e a latência dependem da captura do monitor e da rede. Este port cobre o cliente SteamVR. Sala VR, Bluetooth ESP32 no celular e Moonlight integrado são recursos da versão Android que ainda não foram portados.
+No iPhone, ative **Exibir vídeo do PC**, selecione **Captura StormVR (8089)** e informe o código exibido. Use a mesma configuração de formato de vídeo descrita acima. O transmissor entrega sempre o quadro mais recente e envia somente imagem. A qualidade e a latência dependem da captura do monitor e da rede.
 
 ## Compilar e exportar o IPA
 

@@ -1,0 +1,25 @@
+//
+//  TemporaryApp.h
+//  Moonlight
+//
+//  Created by Cameron Gutman on 9/30/15.
+//  Copyright © 2015 Moonlight Stream. All rights reserved.
+//
+
+#import "TemporaryHost.h"
+
+@interface TemporaryApp : NSObject
+
+@property (nullable, nonatomic, retain) NSString *id;
+@property (nullable, nonatomic, retain) NSString *name;
+@property (nullable, nonatomic, retain) NSString *installPath;
+@property (nonatomic)                   BOOL hdrSupported;
+@property (nonatomic)                   BOOL hidden;
+@property (nullable, nonatomic, retain) TemporaryHost *host;
+
+NS_ASSUME_NONNULL_BEGIN
+
+
+NS_ASSUME_NONNULL_END
+
+@end

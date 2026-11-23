@@ -2,13 +2,34 @@ import Foundation
 import ImageIO
 import SwiftUI
 
+struct StereoVideoFrame {
+    let left: CGImage
+    let right: CGImage
+
+    init?(image: CGImage, inputIsSBS: Bool) {
+        if inputIsSBS {
+            let width = image.width / 2
+            guard width > 0,
+                  let left = image.cropping(to: CGRect(x: 0, y: 0, width: width, height: image.height)),
+                  let right = image.cropping(to: CGRect(x: image.width - width, y: 0, width: width, height: image.height)) else {
+                return nil
+            }
+            self.left = left
+            self.right = right
+        } else {
+            left = image
+            right = image
+        }
+    }
+}
+
 @MainActor
 final class VideoFeed: ObservableObject {
-    @Published private(set) var image: CGImage?
+    @Published private(set) var frame: StereoVideoFrame?
     @Published private(set) var status = "Aguardando vídeo do PC…"
     private var task: Task<Void, Never>?
 
-    func start(url: URL, token: String) {
+    func start(url: URL, token: String, inputIsSBS: Bool) {
         stop()
         task = Task.detached(priority: .userInitiated) { [weak self] in
             let config = URLSessionConfiguration.ephemeral
@@ -27,24 +48,30 @@ final class VideoFeed: ObservableObject {
                     let (data, response) = try await session.data(for: request)
                     guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
                     if http.statusCode == 401 {
-                        await self?.update(image: nil, status: "Código do vídeo inválido")
+                        await self?.update(frame: nil, status: "Código do vídeo inválido")
                         return
                     }
-                    if http.statusCode == 204 || http.statusCode == 503 {
+                    if http.statusCode == 204 {
+                        try await Task.sleep(nanoseconds: 30_000_000)
+                        continue
+                    }
+                    if http.statusCode == 503 {
                         frameID = ""
-                        await self?.update(image: nil, status: "Aguardando captura no PC…")
+                        await self?.update(frame: nil, status: "Aguardando captura no PC…")
                         try await Task.sleep(nanoseconds: 300_000_000)
                         continue
                     }
                     guard http.statusCode == 200, http.mimeType == "image/jpeg",
                           data.count <= 8 * 1024 * 1024,
-                          let decoded = Self.decode(data) else { throw URLError(.cannotDecodeContentData) }
+                          let decoded = Self.decode(data), let frame = StereoVideoFrame(image: decoded, inputIsSBS: inputIsSBS) else {
+                        throw URLError(.cannotDecodeContentData)
+                    }
                     frameID = http.value(forHTTPHeaderField: "ETag") ?? ""
-                    await self?.update(image: decoded, status: "")
+                    await self?.update(frame: frame, status: "")
                 } catch {
                     if Task.isCancelled { return }
                     frameID = ""
-                    await self?.update(image: nil, status: "Vídeo indisponível · Verifique a captura no PC")
+                    await self?.update(frame: nil, status: "Vídeo indisponível · Verifique a captura no PC")
                     try? await Task.sleep(nanoseconds: 800_000_000)
                 }
             }
@@ -54,13 +81,13 @@ final class VideoFeed: ObservableObject {
     func stop() {
         task?.cancel()
         task = nil
-        image = nil
+        frame = nil
         status = "Aguardando vídeo do PC…"
     }
 
-    private func update(image: CGImage?, status: String) {
+    private func update(frame: StereoVideoFrame?, status: String) {
         guard !Task.isCancelled else { return }
-        self.image = image
+        self.frame = frame
         self.status = status
     }
 

@@ -24,8 +24,10 @@ private struct ContentView: View {
     @AppStorage("leftHand") private var leftHand = false
     @AppStorage("trackHands") private var trackHands = false
     @AppStorage("showVideo") private var showVideo = false
-    @AppStorage("stereo") private var stereo = true
+    @AppStorage("hostVideoSource") private var videoSource = HostVideoSource.apollo
+    @AppStorage("inputIsSBS") private var inputIsSBS = false
     @StateObject private var video = VideoFeed()
+    @StateObject private var apollo = ApolloFeed()
     @State private var token = ""
     @State private var activeMode: TrackingMode?
     @State private var tracking: TrackingSession?
@@ -97,19 +99,32 @@ private struct ContentView: View {
                             .textFieldStyle(.roundedBorder)
                         Toggle("Exibir vídeo do PC", isOn: $showVideo)
                         if showVideo {
-                            HStack {
-                                TextField("Porta do vídeo", text: $videoPort)
-                                    .accessibilityLabel("Porta do vídeo")
-                                    .keyboardType(.numberPad)
-                                    .textFieldStyle(.roundedBorder)
-                                    .frame(width: 120)
-                                SecureField("Código do vídeo", text: $token)
-                                    .accessibilityLabel("Código do vídeo")
-                                    .textInputAutocapitalization(.never)
-                                    .autocorrectionDisabled()
-                                    .textFieldStyle(.roundedBorder)
+                            Picker("Fonte de vídeo", selection: $videoSource) {
+                                ForEach(HostVideoSource.allCases) { Text($0.rawValue).tag($0) }
                             }
-                            Toggle("Imagem lado a lado (SBS)", isOn: $stereo)
+                            if videoSource == .apollo {
+                                Button("Conectar ao Apollo", action: prepareApollo).buttonStyle(.bordered)
+                                if !apollo.applications.isEmpty {
+                                    Picker("Aplicativo do PC", selection: $apollo.selectedApp) {
+                                        ForEach(apollo.applications, id: \.identifier) { Text($0.title).tag($0.identifier) }
+                                    }
+                                }
+                                Text(apollo.status).font(.footnote).foregroundStyle(.secondary)
+                            } else {
+                                HStack {
+                                    TextField("Porta do vídeo", text: $videoPort)
+                                        .accessibilityLabel("Porta do vídeo")
+                                        .keyboardType(.numberPad)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 120)
+                                    SecureField("Código do vídeo", text: $token)
+                                        .accessibilityLabel("Código do vídeo")
+                                        .textInputAutocapitalization(.never)
+                                        .autocorrectionDisabled()
+                                        .textFieldStyle(.roundedBorder)
+                                }
+                            }
+                            Toggle("PC já envia os dois olhos (SBS)", isOn: $inputIsSBS)
                         }
                     }
                     Button(pending ? "Aguardando permissão…" : "Iniciar sessão", action: start)
@@ -135,12 +150,17 @@ private struct ContentView: View {
     private var headset: some View {
         ZStack(alignment: .top) {
             Color.black.ignoresSafeArea()
-            if let image = video.image, showVideo {
-                if stereo {
-                    eye(image)
-                } else {
-                    HStack(spacing: 0) { eye(image); eye(image) }
+            if showVideo && videoSource == .apollo {
+                ApolloVideoSurface(frames: apollo.frames, inputIsSBS: inputIsSBS).ignoresSafeArea()
+            } else if let frame = video.frame, showVideo {
+                GeometryReader { geometry in
+                    let eyeWidth = geometry.size.width / 2
+                    HStack(spacing: 0) {
+                        eye(frame.left).frame(width: eyeWidth, height: geometry.size.height)
+                        eye(frame.right).frame(width: eyeWidth, height: geometry.size.height)
+                    }
                 }
+                .ignoresSafeArea()
             } else {
                 VStack(spacing: 6) {
                     Text(showVideo ? video.status : "Rastreamento do headset")
@@ -152,7 +172,12 @@ private struct ContentView: View {
 
             if showHud {
                 HStack {
-                    status
+                    VStack(alignment: .leading) {
+                        status
+                        if showVideo && videoSource == .apollo && !apollo.status.isEmpty {
+                            Text(apollo.status).font(.caption)
+                        }
+                    }
                     Spacer()
                     controls
                 }
@@ -236,6 +261,17 @@ private struct ContentView: View {
         .font(.caption)
     }
 
+    private func prepareApollo() {
+        let server = address.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let bytes = IPv4Address(server)?.rawValue,
+              bytes[0] == 10 || (bytes[0] == 172 && (16...31).contains(bytes[1])) || (bytes[0] == 192 && bytes[1] == 168) else {
+            message = "Informe o IPv4 local do PC para usar o Apollo."
+            return
+        }
+        message = ""
+        apollo.prepare(address: server)
+    }
+
     private func start() {
         message = ""
         let server = address.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -252,7 +288,12 @@ private struct ContentView: View {
         }
         var videoURL: URL?
         let code = token.trimmingCharacters(in: .whitespacesAndNewlines)
-        if selected != .controller && showVideo {
+        let usesApollo = selected != .controller && showVideo && videoSource == .apollo
+        if usesApollo && !apollo.isReady(for: server) {
+            message = "Toque em Conectar ao Apollo e escolha um aplicativo do PC."
+            return
+        }
+        if selected != .controller, showVideo, videoSource == .capture {
             let allowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
             guard let tcp = UInt16(videoPort), tcp >= 1024, code.count == 16,
                   code.unicodeScalars.allSatisfy({ allowed.contains($0) }) else {
@@ -305,7 +346,8 @@ private struct ContentView: View {
             tracking = session
             UIApplication.shared.isIdleTimerDisabled = true
             session.start()
-            if let videoURL { video.start(url: videoURL, token: code) }
+            if usesApollo { apollo.start() }
+            if let videoURL { video.start(url: videoURL, token: code, inputIsSBS: inputIsSBS) }
         }
     }
 
@@ -316,6 +358,7 @@ private struct ContentView: View {
         tracking = nil
         activeMode = nil
         video.stop()
+        apollo.stop()
         UIApplication.shared.isIdleTimerDisabled = false
     }
 
