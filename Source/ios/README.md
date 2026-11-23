@@ -21,11 +21,23 @@ No Android, o prazo de perda passou a ser independente para cada mão, e o fecha
 
 ## Exibir a imagem do PC com Apollo
 
-1. No iPhone, informe o IPv4 do PC, ative **Exibir vídeo do PC** e escolha **Apollo / Sunshine**.
-2. Toque em **Conectar ao Apollo**. Se aparecer um PIN, digite-o na aba **PIN** do painel Apollo no PC, normalmente em `https://localhost:47990`. Use **StormVR iPhone** como nome do cliente.
-3. Selecione **Desktop** ou o aplicativo configurado no Apollo para capturar o monitor do SteamVR. Toque em **Iniciar sessão**. O StormVR solicita vídeo H.264 a 1080p/60, com áudio estéreo. A porta do rastreamento no driver continua sendo 5556 por padrão.
+1. No iPhone, ative **Exibir vídeo do PC**, escolha **Apollo / Sunshine** e toque em **Buscar PC na rede**. Se o host não aparecer, informe o IPv4 e toque em **Conectar ao Apollo**.
+2. Se aparecer um PIN, digite-o na aba **PIN** do painel Apollo no PC, normalmente em `https://localhost:47990`. Use **StormVR iPhone** como nome do cliente. Na lista de clientes do Apollo, conceda **Launch Apps** ao iPhone se necessário.
+3. Escolha **Virtual Display** para um monitor separado, **StormVR SteamVR** se você configurou o aplicativo abaixo, ou **Desktop** para capturar o desktop comum. O StormVR pede H.264 a 60 fps, com áudio estéreo. No monitor virtual, a largura solicitada acompanha a proporção do iPhone. A porta UDP do rastreamento continua sendo 5556 por padrão.
 
-O visor coloca uma imagem em cada olho. Para um desktop comum, deixe **PC já envia os dois olhos (SBS)** desligado e o app mostrará a mesma imagem nos dois olhos. Para ter profundidade estereoscópica, capture uma saída do PC que já contenha os olhos esquerdo e direito lado a lado e ligue a opção. O app recorta a metade correspondente a cada olho.
+### Monitor virtual separado
+
+1. Use Apollo com o driver SudoVDA instalado. Selecione **Virtual Display** no StormVR e inicie a sessão. No Windows, use o modo de telas **Estender** para que o monitor virtual tenha sua própria área de trabalho.
+2. Quando o monitor virtual aparecer, abra o SteamVR. No painel StormVR do PC, em **Headset**, escolha esse monitor e reinicie o SteamVR para fixar a saída. Desative **MODO TV** para renderizar os dois olhos.
+3. Para abrir o SteamVR junto da transmissão, crie um aplicativo no Apollo chamado **StormVR SteamVR**, marque **Always use Virtual Display** e adicione `steam://rungameid/250820` aos comandos separados (*Detached Commands*). Feche o SteamVR antes de iniciar esse aplicativo pelo iPhone. O Apollo cria o monitor antes de executar o comando. [Apollo e SudoVDA](https://github.com/ClassicOldSong/Apollo#about-virtual-display)
+
+### Proporção e lentes do Shinecon G10
+
+- **Desktop / mono** mostra o mesmo quadro nos dois olhos.
+- **SBS do SteamVR** recorta o esquerdo e direito de um quadro com os dois olhos. A opção **PC já corrigiu as lentes** mantém a correção óptica feita no PC.
+- **SBS comprimido (Half-SBS)** repõe a largura de cada olho. Use para fontes com compressão horizontal de 2×.
+
+**Preencher** amplia cada olho mantendo a proporção e recorta o excedente. Desligue para ver o quadro inteiro. Abra **Ajustar lentes · Shinecon G10** e use a grade para alinhar as duas cruzes com as lentes. Ajuste **Separação**, **Altura**, **Zoom** e **Distorção**. A separação começa em 62 mm, conforme a ficha do fabricante. A largura física da tela é estimada e a distorção inicial é aproximada. [Ficha do Shinecon SC-G10](https://www.shinecon.com/uploads/11438/files/VR-Glasses-Product-List--Shinecon.pdf)
 
 ## Exibir a imagem com a captura StormVR
 

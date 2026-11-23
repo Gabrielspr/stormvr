@@ -14,9 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
           applications:(void (^)(NSArray<SVRApolloApplication *> *applications))applications
     NS_SWIFT_NAME(prepare(host:status:applications:));
 - (void)startApplication:(NSString *)identifier
+                    width:(int)width
                     frame:(void (^)(CVPixelBufferRef frame))frame
                    status:(void (^)(NSString *status))status
-    NS_SWIFT_NAME(start(application:frame:status:));
+    NS_SWIFT_NAME(start(application:width:frame:status:));
 - (void)stop;
 @end
 

@@ -1,35 +1,15 @@
+import CoreImage
 import Foundation
 import ImageIO
 import SwiftUI
 
-struct StereoVideoFrame {
-    let left: CGImage
-    let right: CGImage
-
-    init?(image: CGImage, inputIsSBS: Bool) {
-        if inputIsSBS {
-            let width = image.width / 2
-            guard width > 0,
-                  let left = image.cropping(to: CGRect(x: 0, y: 0, width: width, height: image.height)),
-                  let right = image.cropping(to: CGRect(x: image.width - width, y: 0, width: width, height: image.height)) else {
-                return nil
-            }
-            self.left = left
-            self.right = right
-        } else {
-            left = image
-            right = image
-        }
-    }
-}
-
 @MainActor
 final class VideoFeed: ObservableObject {
-    @Published private(set) var frame: StereoVideoFrame?
+    let frames = HeadsetFrames()
     @Published private(set) var status = "Aguardando vídeo do PC…"
     private var task: Task<Void, Never>?
 
-    func start(url: URL, token: String, inputIsSBS: Bool) {
+    func start(url: URL, token: String) {
         stop()
         task = Task.detached(priority: .userInitiated) { [weak self] in
             let config = URLSessionConfiguration.ephemeral
@@ -63,11 +43,11 @@ final class VideoFeed: ObservableObject {
                     }
                     guard http.statusCode == 200, http.mimeType == "image/jpeg",
                           data.count <= 8 * 1024 * 1024,
-                          let decoded = Self.decode(data), let frame = StereoVideoFrame(image: decoded, inputIsSBS: inputIsSBS) else {
+                          let decoded = Self.decode(data) else {
                         throw URLError(.cannotDecodeContentData)
                     }
                     frameID = http.value(forHTTPHeaderField: "ETag") ?? ""
-                    await self?.update(frame: frame, status: "")
+                    await self?.update(frame: decoded, status: "")
                 } catch {
                     if Task.isCancelled { return }
                     frameID = ""
@@ -81,14 +61,14 @@ final class VideoFeed: ObservableObject {
     func stop() {
         task?.cancel()
         task = nil
-        frame = nil
+        frames.replace(with: nil)
         status = "Aguardando vídeo do PC…"
     }
 
-    private func update(frame: StereoVideoFrame?, status: String) {
+    private func update(frame: CGImage?, status: String) {
         guard !Task.isCancelled else { return }
-        self.frame = frame
-        self.status = status
+        frames.replace(with: frame.map { CIImage(cgImage: $0) })
+        if self.status != status { self.status = status }
     }
 
     nonisolated private static func decode(_ data: Data) -> CGImage? {

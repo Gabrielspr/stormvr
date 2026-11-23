@@ -4,6 +4,10 @@
 	classes = {};
 	objectVersion = 56;
 	objects = {
+		271A5A258D45DB5CED1F73B7 /* HostDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HostDiscovery.swift"; sourceTree = "<group>"; };
+		EC392A787ED827CD981636A3 /* HostDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A5A258D45DB5CED1F73B7 /* HostDiscovery.swift */; };
+		39C4CAF61D82A7F3BC8A4EB8 /* DisplayGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DisplayGeometry.swift"; sourceTree = "<group>"; };
+		4DAAD6D2A48B60130EE0EC90 /* DisplayGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C4CAF61D82A7F3BC8A4EB8 /* DisplayGeometry.swift */; };
 		9C3198CB667B74EC2E9C13CE /* ApolloFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApolloFeed.swift"; sourceTree = "<group>"; };
 		26789EE7AFFCC9E62CB37E6F /* ApolloFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3198CB667B74EC2E9C13CE /* ApolloFeed.swift */; };
 		1DAF8E1EA3B2853E4E151FF2 /* SVRApolloClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SVRApolloClient.m"; sourceTree = "<group>"; };
@@ -183,7 +187,7 @@
 		};
 		A10000000000000000000302 = {
 			isa = PBXGroup;
-			children = (A10000000000000000000201, A10000000000000000000202, A10000000000000000000203, A10000000000000000000204, A10000000000000000000205, A10000000000000000000206, A10000000000000000000207, 9C3198CB667B74EC2E9C13CE /* ApolloFeed.swift */, 1DAF8E1EA3B2853E4E151FF2 /* SVRApolloClient.m */, 90F63474BAEF282A8224AC07 /* SVRApolloClient.h */, 37C789E4708B41725DEFBC79 /* StormVR-Bridging-Header.h */);
+			children = (A10000000000000000000201, A10000000000000000000202, A10000000000000000000203, A10000000000000000000204, A10000000000000000000205, A10000000000000000000206, A10000000000000000000207, 9C3198CB667B74EC2E9C13CE /* ApolloFeed.swift */, 39C4CAF61D82A7F3BC8A4EB8 /* DisplayGeometry.swift */, 1DAF8E1EA3B2853E4E151FF2 /* SVRApolloClient.m */, 90F63474BAEF282A8224AC07 /* SVRApolloClient.h */, 37C789E4708B41725DEFBC79 /* StormVR-Bridging-Header.h */, 271A5A258D45DB5CED1F73B7 /* HostDiscovery.swift */);
 			path = StormVR;
 			sourceTree = "<group>";
 		};
@@ -203,6 +207,8 @@
 				A10000000000000000000104,
 				A10000000000000000000105,
 				26789EE7AFFCC9E62CB37E6F /* ApolloFeed.swift in Sources */,
+				EC392A787ED827CD981636A3 /* HostDiscovery.swift in Sources */,
+				4DAAD6D2A48B60130EE0EC90 /* DisplayGeometry.swift in Sources */,
 				1B600BDB17E2BD41CD7F3F72 /* SVRApolloClient.m in Sources */,
 				D9DA494CE3AEE3DFC302BAFA /* AppListResponse.m in Sources */,
 				0AD3F892354BE5F9CDEE4D7B /* CryptoManager.m in Sources */,
@@ -340,10 +346,10 @@
 				OTHER_LDFLAGS = ("$(inherited)", "-lxml2", "-lopus", "-lSDL2", "-framework", "AudioToolbox", "-framework", "AVFoundation", "-framework", "CoreAudio", "-framework", "CoreBluetooth", "-framework", "CoreHaptics", "-framework", "CoreMedia", "-framework", "GameController", "-framework", "OpenGLES", "-framework", "QuartzCore", "-framework", "Security", "-framework", "VideoToolbox");
 				SWIFT_OBJC_BRIDGING_HEADER = StormVR/StormVR-Bridging-Header.h;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = StormVR/Info.plist;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stormvr.ios;
 				PRODUCT_NAME = StormVR;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -366,10 +372,10 @@
 				OTHER_LDFLAGS = ("$(inherited)", "-lxml2", "-lopus", "-lSDL2", "-framework", "AudioToolbox", "-framework", "AVFoundation", "-framework", "CoreAudio", "-framework", "CoreBluetooth", "-framework", "CoreHaptics", "-framework", "CoreMedia", "-framework", "GameController", "-framework", "OpenGLES", "-framework", "QuartzCore", "-framework", "Security", "-framework", "VideoToolbox");
 				SWIFT_OBJC_BRIDGING_HEADER = StormVR/StormVR-Bridging-Header.h;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = StormVR/Info.plist;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stormvr.ios;
 				PRODUCT_NAME = StormVR;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

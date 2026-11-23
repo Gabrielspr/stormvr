@@ -142,7 +142,7 @@
     });
 }
 
-- (void)startApplication:(NSString *)identifier frame:(void (^)(CVPixelBufferRef))frame
+- (void)startApplication:(NSString *)identifier width:(int)width frame:(void (^)(CVPixelBufferRef))frame
                   status:(void (^)(NSString *))status {
     [self stop];
     uint64_t generation = atomic_fetch_add(&_generation, 1) + 1;
@@ -174,7 +174,7 @@
         config.serverCodecModeSupport = [[info getStringTag:@"ServerCodecModeSupport"] intValue];
         config.serverCert = host.serverCert;
         config.appID = identifier;
-        config.width = 1920;
+        config.width = width;
         config.height = 1080;
         config.frameRate = 60;
         config.bitRate = 20000;

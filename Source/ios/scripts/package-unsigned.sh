@@ -20,6 +20,8 @@ trap 'rm -rf "$stage"' EXIT
 
 xcrun swiftc "$root/StormVR/Wire.swift" "$root/tests/WireCheck.swift" -o "$stage/wire-check"
 "$stage/wire-check"
+xcrun swiftc "$root/StormVR/DisplayGeometry.swift" "$root/tests/DisplayCheck.swift" -o "$stage/display-check"
+"$stage/display-check"
 xcodebuild -project "$root/StormVR.xcodeproj" -scheme StormVR -configuration Release \
   -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$stage/build" \
   CODE_SIGNING_ALLOWED=NO build

@@ -26,8 +26,16 @@ private struct ContentView: View {
     @AppStorage("showVideo") private var showVideo = false
     @AppStorage("hostVideoSource") private var videoSource = HostVideoSource.apollo
     @AppStorage("inputIsSBS") private var inputIsSBS = false
+    @AppStorage("videoPacking") private var packingPreference = ""
+    @AppStorage("viewerFill") private var viewerFill = true
+    @AppStorage("viewerZoom") private var viewerZoom = 1.0
+    @AppStorage("g10LensDistance") private var lensDistance = 62.0
+    @AppStorage("g10VerticalOffset") private var verticalOffset = 0.0
+    @AppStorage("g10Distortion") private var lensDistortion = 0.10
+    @AppStorage("stereoAlreadyCorrected") private var stereoAlreadyCorrected = true
     @StateObject private var video = VideoFeed()
     @StateObject private var apollo = ApolloFeed()
+    @StateObject private var discovery = HostDiscovery()
     @State private var token = ""
     @State private var activeMode: TrackingMode?
     @State private var tracking: TrackingSession?
@@ -36,10 +44,27 @@ private struct ContentView: View {
     @State private var message = ""
     @State private var report = TrackingReport(status: "Aguardando sensores…", rate: 0, hands: nil)
     @State private var showHud = true
+    @State private var calibrating = false
+    @State private var showGrid = true
+
+    private var packing: VideoPacking {
+        VideoPacking(rawValue: packingPreference) ?? (inputIsSBS ? .stereo : .mono)
+    }
+
+    private var layout: ViewerLayout {
+        let needsCorrection = packing == .mono || !stereoAlreadyCorrected || (calibrating && showGrid)
+        return ViewerLayout(packing: packing, fill: viewerFill, zoom: viewerZoom,
+                            lensDistance: lensDistance, verticalOffset: verticalOffset,
+                            distortion: needsCorrection ? lensDistortion : 0)
+    }
+
+    private var currentFrames: HeadsetFrames { videoSource == .apollo ? apollo.frames : video.frames }
 
     var body: some View {
         Group {
-            if let activeMode {
+            if calibrating {
+                calibration
+            } else if let activeMode {
                 if activeMode == .controller { controller }
                 else { headset }
             } else {
@@ -49,6 +74,7 @@ private struct ContentView: View {
         .onChange(of: scenePhase) { phase in
             if phase == .background {
                 let interrupted = activeMode != nil || pending
+                discovery.stop()
                 stop()
                 if interrupted { message = "Sessão encerrada ao sair do StormVR." }
             }
@@ -103,10 +129,31 @@ private struct ContentView: View {
                                 ForEach(HostVideoSource.allCases) { Text($0.rawValue).tag($0) }
                             }
                             if videoSource == .apollo {
+                                Button(discovery.searching ? "Buscando na rede…" : "Buscar PC na rede", action: discovery.search)
+                                    .buttonStyle(.bordered)
+                                    .disabled(discovery.searching)
+                                ForEach(discovery.hosts) { host in
+                                    Button {
+                                        address = host.address
+                                        discovery.stop()
+                                        prepareApollo()
+                                    } label: {
+                                        Label("\(host.name) · \(host.address)", systemImage: "desktopcomputer")
+                                    }
+                                }
+                                if !discovery.status.isEmpty {
+                                    Text(discovery.status).font(.footnote).foregroundStyle(.secondary)
+                                }
                                 Button("Conectar ao Apollo", action: prepareApollo).buttonStyle(.bordered)
                                 if !apollo.applications.isEmpty {
                                     Picker("Aplicativo do PC", selection: $apollo.selectedApp) {
                                         ForEach(apollo.applications, id: \.identifier) { Text($0.title).tag($0.identifier) }
+                                    }
+                                    if apollo.applications.contains(where: {
+                                        $0.identifier == apollo.selectedApp && ApolloFeed.isVirtualDisplay($0)
+                                    }) {
+                                        Text("O Apollo cria o monitor ao iniciar. Use esse monitor na aba Headset do StormVR no PC.")
+                                            .font(.footnote).foregroundStyle(.secondary)
                                     }
                                 }
                                 Text(apollo.status).font(.footnote).foregroundStyle(.secondary)
@@ -124,7 +171,12 @@ private struct ContentView: View {
                                         .textFieldStyle(.roundedBorder)
                                 }
                             }
-                            Toggle("PC já envia os dois olhos (SBS)", isOn: $inputIsSBS)
+                            Picker("Formato do vídeo", selection: Binding(
+                                get: { packing }, set: { packingPreference = $0.rawValue }
+                            )) {
+                                ForEach(VideoPacking.allCases) { Text($0.rawValue).tag($0) }
+                            }
+                            Button("Ajustar lentes · Shinecon G10", action: openCalibration).buttonStyle(.bordered)
                         }
                     }
                     Button(pending ? "Aguardando permissão…" : "Iniciar sessão", action: start)
@@ -150,21 +202,17 @@ private struct ContentView: View {
     private var headset: some View {
         ZStack(alignment: .top) {
             Color.black.ignoresSafeArea()
-            if showVideo && videoSource == .apollo {
-                ApolloVideoSurface(frames: apollo.frames, inputIsSBS: inputIsSBS).ignoresSafeArea()
-            } else if let frame = video.frame, showVideo {
-                GeometryReader { geometry in
-                    let eyeWidth = geometry.size.width / 2
-                    HStack(spacing: 0) {
-                        eye(frame.left).frame(width: eyeWidth, height: geometry.size.height)
-                        eye(frame.right).frame(width: eyeWidth, height: geometry.size.height)
-                    }
+            if showVideo {
+                HeadsetVideoSurface(frames: currentFrames, layout: layout).ignoresSafeArea()
+                if videoSource == .capture && !video.status.isEmpty {
+                    Text(video.status)
+                        .font(.callout)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .ignoresSafeArea()
             } else {
                 VStack(spacing: 6) {
-                    Text(showVideo ? video.status : "Rastreamento do headset")
-                    if !showVideo { Text(report.status).foregroundStyle(.secondary) }
+                    Text("Rastreamento do headset")
+                    Text(report.status).foregroundStyle(.secondary)
                 }
                 .font(.callout)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -179,6 +227,9 @@ private struct ContentView: View {
                         }
                     }
                     Spacer()
+                    if showVideo {
+                        Button("Lentes", action: openCalibration).buttonStyle(.bordered)
+                    }
                     controls
                 }
                 .padding(8)
@@ -192,11 +243,57 @@ private struct ContentView: View {
         .persistentSystemOverlays(.hidden)
     }
 
-    private func eye(_ image: CGImage) -> some View {
-        Image(decorative: image, scale: 1)
-            .resizable()
-            .scaledToFit()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    private func openCalibration() {
+        showGrid = true
+        calibrating = true
+    }
+
+    private var calibration: some View {
+        ZStack(alignment: .bottom) {
+            Color.black.ignoresSafeArea()
+            HeadsetVideoSurface(frames: currentFrames, layout: layout, showGrid: showGrid).ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Shinecon G10").font(.headline)
+                    Spacer()
+                    if activeMode != nil { Toggle("Grade", isOn: $showGrid).toggleStyle(.button) }
+                    Button("Concluir") { calibrating = false }.buttonStyle(.borderedProminent)
+                }
+                HStack(spacing: 16) {
+                    viewerSlider("Separação", value: $lensDistance, range: 50...72)
+                    viewerSlider("Altura", value: $verticalOffset, range: -0.14...0.14)
+                    viewerSlider("Zoom", value: $viewerZoom, range: 0.8...1.35)
+                    viewerSlider("Distorção", value: $lensDistortion, range: 0...0.28)
+                }
+                HStack {
+                    Toggle("Preencher", isOn: $viewerFill)
+                    if packing != .mono {
+                        Toggle("PC já corrigiu as lentes", isOn: $stereoAlreadyCorrected)
+                    }
+                    Spacer()
+                    Button("Restaurar") {
+                        lensDistance = 62
+                        verticalOffset = 0
+                        viewerZoom = 1
+                        lensDistortion = 0.10
+                        viewerFill = true
+                    }
+                }
+                .font(.caption)
+            }
+            .padding(12)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+            .padding(.horizontal, 12)
+        }
+        .statusBarHidden(true)
+        .persistentSystemOverlays(.hidden)
+    }
+
+    private func viewerSlider(_ label: String, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(label).font(.caption)
+            Slider(value: value, in: range).accessibilityLabel(Text(label))
+        }
     }
 
     private var controller: some View {
@@ -262,6 +359,7 @@ private struct ContentView: View {
     }
 
     private func prepareApollo() {
+        discovery.stop()
         let server = address.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let bytes = IPv4Address(server)?.rawValue,
               bytes[0] == 10 || (bytes[0] == 172 && (16...31).contains(bytes[1])) || (bytes[0] == 192 && bytes[1] == 168) else {
@@ -347,13 +445,14 @@ private struct ContentView: View {
             UIApplication.shared.isIdleTimerDisabled = true
             session.start()
             if usesApollo { apollo.start() }
-            if let videoURL { video.start(url: videoURL, token: code, inputIsSBS: inputIsSBS) }
+            if let videoURL { video.start(url: videoURL, token: code) }
         }
     }
 
     private func stop() {
         runID = UUID()
         pending = false
+        calibrating = false
         tracking?.stop()
         tracking = nil
         activeMode = nil

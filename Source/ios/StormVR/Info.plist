@@ -48,7 +48,11 @@
 	<key>NSCameraUsageDescription</key>
 	<string>O StormVR usa a câmera para rastrear a posição do iPhone e os gestos das mãos. As imagens são processadas no aparelho.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>O StormVR envia a pose para o SteamVR e recebe vídeo do computador na mesma rede.</string>
+	<string>O StormVR procura o Apollo, envia a pose para o SteamVR e recebe vídeo do computador na mesma rede.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_nvstream._tcp</string>
+	</array>
 	<key>NSMotionUsageDescription</key>
 	<string>O StormVR usa o giroscópio e o acelerômetro para rastrear a orientação do iPhone.</string>
 	<key>UIApplicationSceneManifest</key>
