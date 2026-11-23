@@ -27,6 +27,7 @@ xcodebuild -project "$root/StormVR.xcodeproj" -scheme StormVR -configuration Rel
   CODE_SIGNING_ALLOWED=NO build
 app="$stage/build/Build/Products/Release-iphoneos/StormVR.app"
 xcrun lipo "$app/StormVR" -verify_arch arm64
+bash "$root/scripts/check-app-frameworks.sh" "$app" StormVR
 mkdir -p "$stage/Payload"
 ditto "$app" "$stage/Payload/StormVR.app"
 ditto -c -k --norsrc --keepParent "$stage/Payload" "$stage/StormVR-unsigned.ipa"

@@ -346,10 +346,11 @@
 				OTHER_LDFLAGS = ("$(inherited)", "-lxml2", "-lopus", "-lSDL2", "-framework", "AudioToolbox", "-framework", "AVFoundation", "-framework", "CoreAudio", "-framework", "CoreBluetooth", "-framework", "CoreHaptics", "-framework", "CoreMedia", "-framework", "GameController", "-framework", "OpenGLES", "-framework", "QuartzCore", "-framework", "Security", "-framework", "VideoToolbox");
 				SWIFT_OBJC_BRIDGING_HEADER = StormVR/StormVR-Bridging-Header.h;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = StormVR/Info.plist;
-				MARKETING_VERSION = 0.1.1;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stormvr.ios;
 				PRODUCT_NAME = StormVR;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -372,10 +373,11 @@
 				OTHER_LDFLAGS = ("$(inherited)", "-lxml2", "-lopus", "-lSDL2", "-framework", "AudioToolbox", "-framework", "AVFoundation", "-framework", "CoreAudio", "-framework", "CoreBluetooth", "-framework", "CoreHaptics", "-framework", "CoreMedia", "-framework", "GameController", "-framework", "OpenGLES", "-framework", "QuartzCore", "-framework", "Security", "-framework", "VideoToolbox");
 				SWIFT_OBJC_BRIDGING_HEADER = StormVR/StormVR-Bridging-Header.h;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = StormVR/Info.plist;
-				MARKETING_VERSION = 0.1.1;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stormvr.ios;
 				PRODUCT_NAME = StormVR;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
